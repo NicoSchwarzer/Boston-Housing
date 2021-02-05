@@ -1,0 +1,35 @@
+
+####################
+## decision trees ##
+####################
+
+import pandas as pd
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.model_selection import train_test_split
+
+X4_train, X4_test, y4_train, y4_test = train_test_split(X, y, test_size = 0.3, random_state=42)
+
+
+## looping over different max_depths!
+
+depth_list = [4,5,6,7,8,8,9,10]
+
+for depth in depth_list:
+    list_results = []
+    decision_tree = DecisionTreeRegressor(max_depth = depth)
+    decision_tree.fit(X4_train, y4_train)
+    result = decision_tree.score(X4_test, y4_test)
+    list_results.append(result)
+    print(result)
+    
+    
+## --> list_results = [0.9270993714980137, 0.9367015819142667, 0.9392340836998496, 0.9469590379350307, 0.9599545056560913, 0.9392107125960981, 0.9430650110086635, 0.9603681850908093]
+
+
+best_depth_dict = { 'number': depth_list, 'score': list_results }
+
+print(best_depth_dict)
+# a depth of 4 leads to the best result!
+
