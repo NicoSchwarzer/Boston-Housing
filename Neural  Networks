@@ -1,0 +1,86 @@
+#####################
+## Neural networks ##
+#####################
+
+import pandas as pd
+import numpy as np
+import keras
+from keras.layers import Dense
+from keras.models import Sequential
+from keras.callbacks import EarlyStopping
+
+X = df3.drop('MEDV', axis = 1)
+y = df3['MEDV']
+
+
+cols = df3.shape[1] - 1
+
+model1 = Sequential()
+
+#first layer
+model1.add(Dense(100, activation = "relu", input_shape = (cols, )))
+#second layer
+model1.add(Dense(100, activation = "relu"))
+# third layer
+model1.add(Dense(1))
+
+
+model1.compile(optimizer = 'adam', loss = 'mean_squared_error')
+
+model1.fit(X,y) 
+
+## patience = epochs without improving before stopping
+early_stopping_monitor = EarlyStopping(patience = 20)
+
+model1.fit(X,y, validation_split=0.3, epochs = 200,
+          callbacks = [early_stopping_monitor])
+
+####################
+## Predicting values
+####################
+
+X = df3.drop('MEDV', axis = 1)
+y = pd.DataFrame(df3['MEDV'])
+
+X3_train, X3_test, y3_train, y3_test = train_test_split(X, y, test_size = 0.3, random_state=42)
+
+
+cols2 = df3.shape[1] - 1
+
+model2 = Sequential()
+
+#first layer
+model2.add(Dense(100, activation = "relu", input_shape = (cols2, )))
+#second layer
+model2.add(Dense(100, activation = "relu"))
+# third layer
+model2.add(Dense(1))
+
+
+model2.compile(optimizer = 'adam', loss = 'mean_squared_error')
+
+early_stopping_monitor = EarlyStopping(patience = 20)
+
+model2.fit(X,y, validation_split=0.3, epochs = 200,
+          callbacks = [early_stopping_monitor])
+
+pred3 = model2.predict(X3_test)
+
+list_pred_1 = []
+
+for a in pred3:
+    list_pred_1.append(float(a))
+        
+print(list_pred_1)
+
+y3_test = pd.DataFrame(y3_test)
+
+y3_test["list_pred"] = list_pred_1
+
+y3_test["deviation"] = y3_test["MEDV"] - y3_test["list_pred"]
+
+y3_test.head()
+print(np.mean(y3_test["deviation"]))
+
+## a deviation of only 6§ !!
+
