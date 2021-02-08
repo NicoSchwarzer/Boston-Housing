@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Dec 22 19:24:34 2019
+Created on Tue Feb  9 00:03:08 2021
 
 @author: Nico
 """
+
 #################################################################################
 ## Trying different machine learning algorithms on the boston housing data set ##
 ##################################################################################
@@ -14,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-df1 = pd.read_csv(r"C:\Users\Nico\Documents\Datasets\boston_1.csv", sep = "\,"   )
+df1 = pd.read_csv(r"C:\Users\Nico\Documents\data\Datasets\boston_1.csv", sep = "\,"   )
 
 df1.head()
 
@@ -77,3 +78,5 @@ df3['RAD'] = df3['RAD'].astype('float64')
 df3['TAX'] = df3['TAX'].astype('float64')
 
 
+df3.to_csv(r'C:\Users\Nico\Documents\Data\boston_prep.csv')
+df3 = pd.read_csv(r'C:\Users\Nico\Documents\Data\boston_prep.csv')
