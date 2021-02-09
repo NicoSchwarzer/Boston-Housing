@@ -1,0 +1,136 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb  9 00:06:32 2021
+
+@author: Nico
+"""
+
+import pandas as pd
+import numpy as np
+import torch
+import torch.optim as optim
+import torch.nn as nn
+from torch.autograd import variable
+import torch.nn.functional as F
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+import os
+
+
+df3 = pd.read_csv(r'C:\Users\Nico\Documents\Data\boston_prep.csv')
+
+
+X = np.array(df3.drop('MEDV', axis = 1))
+y = np.array(df3['MEDV'])
+
+
+X3_train, X3_test, y3_train, y3_test = train_test_split(X, y, test_size = 0.3, random_state=42)
+
+##
+
+y3_train = y3_train.reshape(-1,1)
+y3_test = y3_test.reshape(-1,1)
+
+
+##
+
+dim_in = X3_train.shape[1]
+
+########################
+## Coding pytorch net ##
+########################
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# for dropout
+p = 0.03
+
+class NN1_boston(nn.Module)  :# erbt von module 
+    def __init__(self):
+        super(NN1_boston, self).__init__()
+        # layer
+        self.lin1 = nn.Linear(dim_in, 10)
+        self.lin2 = nn.Linear(10,60)  
+        self.drop_layer = nn.Dropout(p=p)
+        self.lin3 = nn.Linear(60,60)  
+        self.drop_layer = nn.Dropout(p=p)
+        self.lin4 = nn.Linear(60,60)
+        self.drop_layer = nn.Dropout(p=p)
+        self.lin5 = nn.Linear(60,40)
+        self.drop_layer = nn.Dropout(p=p)
+        self.lin6 = nn.Linear(40,30)
+        self.drop_layer = nn.Dropout(p=p)
+        ## final
+        self.lin7 = nn.Linear(30,1)
+        
+    def forward(self, x):
+        # forward pass hier - backprop später
+        x = F.leaky_relu(self.lin1(x))
+        x = F.leaky_relu(self.lin2(x))
+        x = F.leaky_relu(self.lin3(x))
+        x = F.leaky_relu(self.lin4(x))
+        x = F.leaky_relu(self.lin5(x))
+        x = F.leaky_relu(self.lin6(x))
+        return x
+        
+    def num_flat_features(self, x):
+        # für 
+        size = x.size()[1:]      # richtige batch dim hier definieren 
+        num = 1
+        
+        for i in size:
+            num *= i  # 
+        return num
+
+netz = NN1_boston()
+    
+print(netz)  # structure    
+
+
+###
+    
+### Calling the NN  ###
+   
+
+criterion = torch.nn.MSELoss()
+    
+learning_rate = 1e-4
+
+optimizer = torch.optim.Adam(netz.parameters(), lr=learning_rate)
+
+itera = 12000
+
+l_iterations = np.ones(itera)
+l_loss = np.ones(itera)
+
+train_x = torch.tensor(X3_train)
+train_y = torch.tensor(y3_train)
+
+
+for i in range(itera):
+    y_pred = netz(train_x.float())
+    
+    loss = criterion(y_pred, train_y.float())
+    if i % 100 == 99:
+        print(i, loss.item())
+        
+    l_iterations[i] = i
+    l_loss[i] = loss
+        
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+
+
+## resaving
+
+if os.path.isfile('netz.pt'):
+    netz = torch.load('netz.pt')
+    
+  # plotting output 
+  
+  plt.plot(l_loss)
+
+
