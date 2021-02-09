@@ -133,4 +133,22 @@ if os.path.isfile('netz.pt'):
   
   plt.plot(l_loss)
 
+#
+#plt.plot(l_loss)
 
+## Evaluating 
+test_x = torch.tensor(X3_test)
+test_y = torch.tensor(y3_test)
+
+# calling
+y_pred = netz(test_x.float())
+#loss
+
+with torch.no_grad():
+    netz.eval()
+    y_pred = netz(test_x.float())
+    val_loss = criterion(y_pred, test_y.float())
+
+
+a = len(l_loss) - 1
+lo = l_loss[len(l_loss)]
